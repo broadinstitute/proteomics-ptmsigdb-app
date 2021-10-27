@@ -2,10 +2,12 @@
 title: "PTM signatures database (PTMsigDB)"
 output:
   html_document:
-    toc: false
-    toc_float: false
+    toc: no
+    toc_float: no
     theme: journal
 runtime: shiny
+resource_files:
+- db/ptm.sig.db.all.v1.9.1.zip
 ---
 <style type="text/css">
 .main-container {
