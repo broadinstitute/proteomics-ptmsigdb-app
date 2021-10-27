@@ -20,25 +20,23 @@ runtime: shiny
 ```{r "init", echo=F, message=F}
 options(warn = -1)
 library(readxl)
-#library(pacman)
 library(knitr)
 library(glue)
 library(magrittr)
 library(shiny)
-#library(RColorBrewer)
 library(DT)
 library(kableExtra)
 
-ver.app <- "v0.0.1"
+ver.app <- "v0.0.2"
 
-dat.xlsx <- 'data/PTMsigDB_all_sites_v1.9.0.xlsx'
+dat.xlsx <- 'data/PTMsigDB_all_sites_v1.9.1.xlsx'
 dat.rds <- sub('\\.xlsx', '.rds', dat.xlsx)
 
 ver <- sub('.*_(v.*)\\.xlsx', '\\1' , dat.xlsx)
 org.all <- c('human', 'mouse', 'rat')
 
 file.zip <- glue("db/ptm.sig.db.all.{ver}.zip")
-file.xlsx <-dat.xlsx
+file.xlsx <- dat.xlsx
 ```
 
 
@@ -48,7 +46,6 @@ if(!file.exists(dat.rds)){
   
     dat <- lapply(org.all, function(org)read_excel(dat.xlsx, sheet = org) )
     names(dat) <- org.all
-    
     
     ## add links to psp
     ## NOT WORKING
@@ -113,7 +110,7 @@ if(!file.exists(dat.rds)){
 }
 ```
 
-```{r "zip-db", echo = F, message = F}
+```{r "zip-db", echo = F, message = F, eval = TRUE}
 if(!file.exists(file.zip)){
   zip(file.zip, files=dir('db/', pattern='.gmt$'))
 }
@@ -199,6 +196,7 @@ PTMsigDB signature sets curated for human, mouse and rat can be downloaded below
 <th>zip</th><th>xlsx</th><th>version</th><th>date</th>
 </tr>
 
+<!---v1.9.1--->
 <tr>
 <td>
 ```{r, echo=F}
@@ -225,17 +223,19 @@ shinyApp(
 ```
 </td>
 <td>`r ver`</td>
-<td>2019-03-18</td>
+<td>2020-10-20</td>
 </tr>
+
+<!---v1.9.0--->
 <tr>
 <td>
 ```{r, echo=F}
-file.zip2 <- glue("db/ptm.sig.db.all.v1.8.1.zip")
+file.zip.v1.9.0 <- glue("db/ptm.sig.db.all.v1.9.0.zip")
 shinyApp(
-  ui=fluidPage(fluidRow(downloadLink('download', label = glue("gmt/zip")))),
+  ui=fluidPage(fluidRow(downloadLink('download.zip.v1.9.0' , label = glue("gmt/zip")))),
   server=function(input, output, session){
-  output$download <- downloadHandler(filename=function(){file.zip2},
-       content = function(file){file.copy( file.zip2, file)}, contentType = "application/zip"
+  output$download.zip.v1.9.0 <- downloadHandler(filename=function(){file.zip.v1.9.0},
+       content = function(file){file.copy( file.zip.v1.9.0, file)}, contentType = "application/zip"
     )
   }, options = list(height = 20)
 )
@@ -243,12 +243,44 @@ shinyApp(
 </td>
 <td>
 ```{r, echo=F}
-file.xlsx1 <- glue("data/PTMsigDB_all_sites_v1.8.1.xlsx")
+file.xlsx.v1.9.0 <- glue("data/PTMsigDB_all_sites_v1.9.0.xlsx")
 shinyApp(
-  ui=fluidPage(fluidRow(downloadLink('download.xlsx1', label = glue("xlsx (Supplemental Table 1)")))),
+  ui=fluidPage(fluidRow(downloadLink('download.xlsx.v1.9.0', label = glue("xlsx")))),
   server=function(input, output, session){
-  output$download.xlsx1 <- downloadHandler(filename=function(){file.xlsx1},
-       content = function(file){file.copy( file.xlsx, file)}, contentType = "application/xlsx"
+  output$download.xlsx.v1.9.0  <- downloadHandler(filename=function(){file.xlsx.v1.9.0 },
+       content = function(file){file.copy( file.xlsx.v1.9.0 , file)}, contentType = "application/xlsx"
+    )
+  }, options = list(height = 20)
+)
+```
+</td>
+<td>v1.9.0</td>
+<td>2019-03-18</td>
+</tr>
+
+<!---v1.8.1--->
+<tr>
+<td>
+```{r, echo=F}
+file.zip.v1.8.1 <- glue("db/ptm.sig.db.all.v1.8.1.zip")
+shinyApp(
+  ui=fluidPage(fluidRow(downloadLink('download.zip.v1.8.1', label = glue("gmt/zip")))),
+  server=function(input, output, session){
+  output$download.zip.v1.8.1 <- downloadHandler(filename=function(){file.zip.v1.8.1},
+       content = function(file){file.copy( file.zip.v1.8.1, file)}, contentType = "application/zip"
+    )
+  }, options = list(height = 20)
+)
+```
+</td>
+<td>
+```{r, echo=F}
+file.xlsx.v1.8.1 <- glue("data/PTMsigDB_all_sites_v1.8.1.xlsx")
+shinyApp(
+  ui=fluidPage(fluidRow(downloadLink('download.xlsx.v1.8.1', label = glue("xlsx (Supplemental Table 1)")))),
+  server=function(input, output, session){
+  output$download.xlsx.v1.8.1 <- downloadHandler(filename=function(){file.xlsx.v1.8.1},
+       content = function(file){file.copy( file.xlsx.v1.8.1, file)}, contentType = "application/xlsx"
     )
   }, options = list(height = 20)
 )
