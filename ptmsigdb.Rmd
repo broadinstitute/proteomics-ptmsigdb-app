@@ -8,6 +8,7 @@ output:
 runtime: shiny
 resource_files:
 - db/ptm.sig.db.all.v1.9.1.zip
+- db/ptm.sig.db.all.v2.0.0.zip
 ---
 <style type="text/css">
 .main-container {
@@ -29,9 +30,9 @@ library(shiny)
 library(DT)
 library(kableExtra)
 
-ver.app <- "v0.0.2"
+ver.app <- "v0.0.3"
 
-dat.xlsx <- 'data/PTMsigDB_all_sites_v1.9.1.xlsx'
+dat.xlsx <- 'data/PTMsigDB_all_sites_v2.0.0.xlsx'
 dat.rds <- sub('\\.xlsx', '.rds', dat.xlsx)
 
 ver <- sub('.*_(v.*)\\.xlsx', '\\1' , dat.xlsx)
@@ -113,9 +114,9 @@ if(!file.exists(dat.rds)){
 ```
 
 ```{r "zip-db", echo = F, message = F, eval = TRUE}
-if(!file.exists(file.zip)){
-  zip(file.zip, files=dir('db/', pattern='.gmt$'))
-}
+# if(!file.exists(file.zip)){
+#   zip(file.zip, files=dir('db/', pattern='.gmt$'))
+# }
 ```
 
 ***
@@ -162,8 +163,6 @@ kable( data.frame(no.signatures=nsignat,
 
 Each row in the table below corresponds to a PTM site in a specific PTM signature set. Each site is represented by 1) UniProt + residue number; 2) flanking amino acid sequence (+/- 7 amino acids); 3) PhosphoSitePlus site group ids. Please refer to our [GitHub](https://github.com/broadinstitute/ssGSEA2.0#ptmsigdb) page for more details. The site annotation column lists the corresponding gene symbol as well as additional information depending on the signature category. Links to relevant publications (pmid) or WikiPathway entries can be found in column *site.annotation*.
 
-
-
 ```{r, echo=F}
 source('src/shinyDataTable.R')
 shinyApp(
@@ -186,6 +185,26 @@ options = list(height = 750, width=2000)
 )
 ```
 
+<details>
+<summary>Signature descriptions</summary>
+Signature sets in PTMsigDB are separated into different categories:
+
++ <code>PERT</code>: Perturbation signatures derived from treatment of cells with perturbagens such as small molecules or growth factors
++ <code>PATH</code>: Signature sets of molecular signaling pathways
++ <code>KINASE</code>: Kinase-substrate signatures
++ <code>DISEASE</code>: Disease-associated signature sets
+
+Signature sets in each category were derived from different sources:
+
++ <code>PSP</code>: PhosphositePlus ([https://www.phosphosite.org/](https://www.phosphosite.org/))
++ <code>WP</code>: WikiPathways ([https://www.wikipathways.org/](https://www.wikipathways.org/))
++ <code>NP</code>: NetPath ([http://www.netpath.org/](http://www.netpath.org/))
++ <code>P100</code>: signature sets curated from the [LINCS](https://lincsproject.org/) [P100](https://panoramaweb.gs.washington.edu/LINCS/P100/targetedms-showList.view?) assay
++ <code>BI</code>: signature sets defined and curated at the Broad Institute  
++ <code>P100-DIA2</code>: signature sets curated from DIA search of [LINCS](https://lincsproject.org/) [P100](https://panoramaweb.org/Panorama%20Public/2021/LINCS%20PCCSE%20P100%202020/project-begin.view?pageId=Raw%20Data) assay
++ <code>iKiP</code>: signature sets from in vitro Kinase-to-Phosphosite interaction database ([iKiP-DB](https://pubs.acs.org/doi/full/10.1021/acs.jproteome.2c00198))
+</details>
+
 ***
 
 ### Downloads
@@ -198,7 +217,7 @@ PTMsigDB signature sets curated for human, mouse and rat can be downloaded below
 <th>zip</th><th>xlsx</th><th>version</th><th>date</th>
 </tr>
 
-<!---v1.9.1--->
+<!---v2.0.0--->
 <tr>
 <td>
 ```{r, echo=F}
@@ -225,6 +244,38 @@ shinyApp(
 ```
 </td>
 <td>`r ver`</td>
+<td>2022-10-25</td>
+</tr>
+
+<!---v1.9.1--->
+<tr>
+<td>
+```{r, echo=F}
+file.zip.v1.9.1 <- glue("db/ptm.sig.db.all.v1.9.1.zip")
+shinyApp(
+  ui=fluidPage(fluidRow(downloadLink('download.zip.v1.9.1' , label = glue("gmt/zip")))),
+  server=function(input, output, session){
+  output$download.zip.v1.9.1 <- downloadHandler(filename=function(){file.zip.v1.9.1},
+       content = function(file){file.copy( file.zip.v1.9.1, file)}, contentType = "application/zip"
+    )
+  }, options = list(height = 20)
+)
+```
+</td>
+<td>
+```{r, echo=F}
+file.xlsx.v1.9.1 <- glue("data/PTMsigDB_all_sites_v1.9.1.xlsx")
+shinyApp(
+  ui=fluidPage(fluidRow(downloadLink('download.xlsx.v1.9.1', label = glue("xlsx")))),
+  server=function(input, output, session){
+  output$download.xlsx.v1.9.1  <- downloadHandler(filename=function(){file.xlsx.v1.9.1 },
+       content = function(file){file.copy( file.xlsx.v1.9.1 , file)}, contentType = "application/xlsx"
+    )
+  }, options = list(height = 20)
+)
+```
+</td>
+<td>v1.9.1</td>
 <td>2020-10-20</td>
 </tr>
 
@@ -295,6 +346,33 @@ shinyApp(
 
 
 </table>
+
+<br/>
+
+<details>
+<summary>Changelog</summary>
+
+* **v2.0.0** Oct 25, 2022
+  + Added extended perturbagen DIA signature sets from [LINCS](https://lincsproject.org/) [P100](https://panoramaweb.org/Panorama%20Public/2021/LINCS%20PCCSE%20P100%202020/project-begin.view?pageId=Raw%20Data) assay
+  + Added in vitro kinase-to-phosphosite interaction database (iKiP-DB) signature sets from [Mari et al. 2022](https://pubs.acs.org/doi/full/10.1021/acs.jproteome.2c00198)
+  + PSP-based signature sets based on Oct 2022 release of PhosphositePlus
+  + WP-based signature sets based on WikiPathways <code>gpml</code>-files downloaded on Oct 25, 2022
+  + Added signature descriptions and changelog
+
+* **v1.9.1** Oct 20, 2020
+  + Added ischemia signature derived from [Mertins et al. 2014](https://pubmed.ncbi.nlm.nih.gov/24719451/)
+  + PSP-based signature sets based on August 2020 release of PhosphositePlus
+  + WP-based signature sets based on WikiPathways <code>gpml</code>-files downloaded on Aug 10, 2020
+  
+* **v1.9.0** Mar 06, 2019
+  + Added disease-associated signatures from [PhosphositePlus](https://www.phosphosite.org/staticDownloads)
+  + PSP-based signature sets based on March 2019 release of PhosphositePlus
+  + WP-based signature sets based on WikiPathways <code>gpml</code>-files downloaded on Feb 10, 2019
+  
+* **v1.8.1** Aug 20, 2018
+  + Version released with our [manuscript](https://www.mcponline.org/content/18/3/576.abstract)
+
+</details>
 
 ***
 
